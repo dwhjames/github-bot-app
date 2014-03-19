@@ -1,0 +1,9 @@
+{:bot-name ""
+ :auth-options {:oauth-token ""}
+ :auto-label
+ {:review-label "review:needed"
+  :review-done-label "review:done"
+  :review-done-comment "^:[+]1:"
+  :qa-label "qa:needed"}
+ :flowdock
+ {:token ""}}
