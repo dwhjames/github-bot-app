@@ -9,14 +9,18 @@
                  [compojure "1.1.6"]
                  [tentacles "0.2.6"]
                  [cheshire "5.3.1"]
-                 [metrics-clojure-ring "1.0.1"]
+                 [com.codahale.metrics/metrics-core "3.0.1"]
+                 [com.codahale.metrics/metrics-jvm "3.0.1"]
+                 [measure "0.1.5"]
                  [org.clojure/tools.logging "0.2.6"]
                  [ch.qos.logback/logback-classic "1.1.1"]]
   :plugins [[lein-ring "0.8.10"]
             [lein-elastic-beanstalk "0.2.8-SNAPSHOT"]
             ;[lein-beanstalk "0.2.7"]
             [lein-awsuberwar "0.1.0"]]
-  :ring {:handler github-bot-app.handler/app}
+  :ring {:handler github-bot-app.handler/app
+         :init github-bot-app.handler/init
+         :destroy github-bot-app.handler/destroy}
   :jvm-opts ["-Dcatalina.base=."]
   :profiles
   {:test {:dependencies [[javax.servlet/servlet-api "2.5"]

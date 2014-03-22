@@ -2,7 +2,7 @@
   (:require [clojure.java.io :as jio]
             [clojure.tools.logging :as log]
             [cheshire.core :as json]
-            [metrics.histograms :as hist]
+            [measure.core :as measure]
             [ring.util.response :refer :all]
             [github-bot-app.pools :as pools]
             [github-bot-app.action.auto-label :as auto-label]
@@ -11,7 +11,8 @@
             [github-bot-app.action.merge-conflict :as merge-conflict]
             [github-bot-app.action.pr-flowdock-chat :as pr-flowdock-chat]
             [github-bot-app.action.pr-police :as pr-police])
-  (:import com.fasterxml.jackson.core.JsonParseException))
+  (:import com.fasterxml.jackson.core.JsonParseException
+           com.codahale.metrics.SharedMetricRegistries))
 
 
 (defn- is-json-content? [type]
@@ -57,7 +58,8 @@
 
 
 (def payload-size-histogram
-  (hist/histogram ["github-bot-app" "webbook" "payload-size"]))
+  (measure/histogram (SharedMetricRegistries/getOrCreate "github-bot-app")
+                     "github-bot-app.webhook.payload-size"))
 
 
 (defn handle-webhook [req config]
@@ -71,7 +73,7 @@
                         :delivery (-> req
                                       (get-in [:headers "x-github-delivery"])
                                       java.util.UUID/fromString)}))
-            (hist/update! payload-size-histogram (:content-length req))
+            (measure/update payload-size-histogram (:content-length req))
             (dispatch-payload-actions event payload config)
             (-> (response nil)
                 (status 204)))
