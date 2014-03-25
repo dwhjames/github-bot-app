@@ -75,7 +75,7 @@
                          (merge {:api-call :specific-pull})
                          pr-str
                          log/info)                     
-                     (when (not (get pull :mergeable true))
+                     (when (false? (:mergeable pull))
                        (log/info (pr-str
                                   {:info :merge-conflict
                                    :number pull-id
