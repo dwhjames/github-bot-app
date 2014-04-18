@@ -23,7 +23,7 @@
       (try
         (.run r)
         (catch Exception ex
-          (log/error ex)
+          (log/error ex "Uncaught exception in pool!")
           (throw ex))))))
 
 

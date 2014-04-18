@@ -58,6 +58,7 @@
     (try
       (handler req)
       (catch Exception e
+        (log/error e (pr-str {:exception (str e) :request req}))
         (->
           (response (str e))
           (status 500))))))
