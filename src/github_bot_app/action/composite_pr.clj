@@ -17,7 +17,7 @@
                 "opened"))
     (let [owner (get-in payload [:repository :owner :login])
           repo (get-in payload [:repository :name])
-          pull-id (get-in payload [:pull_request :numer])
+          pull-id (get-in payload [:pull_request :number])
           commits (github-api-time!
                     (gh-pulls/commits
                      owner repo pull-id
