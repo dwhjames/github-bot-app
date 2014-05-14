@@ -35,7 +35,8 @@
          (gh-issues/create-comment
           owner repo pull-id
           (str "This pull request includes pull requests "
-               (str/join ", " pr-strs))))
+               (str/join ", " pr-strs))
+          (:auth-options config)))
         (log/info (pr-str {:api-call :create-comment
                            :number pull-id
                            :info :composite-pr}))))))
