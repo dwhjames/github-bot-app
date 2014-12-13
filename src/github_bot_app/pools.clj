@@ -3,7 +3,12 @@
   (:import [java.util.concurrent Executors ExecutorService
                                  ScheduledExecutorService ThreadFactory
                                  TimeUnit]
-           java.util.concurrent.atomic.AtomicInteger))
+           java.util.concurrent.atomic.AtomicInteger
+           [com.codahale.metrics
+            InstrumentedExecutorService
+            InstrumentedScheduledExecutorService
+            InstrumentedThreadFactory
+            SharedMetricRegistries]))
 
 
 (defn- create-thread-factory
@@ -36,9 +41,16 @@
 
 
 (def ^ExecutorService dispatch-pool
-  (Executors/newCachedThreadPool
-   (create-thread-factory dispatch-pool-thread-format
-                          dispatch-pool-thread-counter)))
+  (let [registry (SharedMetricRegistries/getOrCreate "github-bot-app")]
+    (InstrumentedExecutorService.
+     (Executors/newCachedThreadPool
+     (InstrumentedThreadFactory.
+      (create-thread-factory dispatch-pool-thread-format
+                             dispatch-pool-thread-counter)
+      registry
+      "github-bot-app-dispatch-threads"))
+     registry
+     "github-bot-app-dispatch-pool")))
 
 
 (defn dispatch
@@ -55,10 +67,17 @@
 
 
 (def ^ScheduledExecutorService scheduled-pool
-  (Executors/newSingleThreadScheduledExecutor
-   (create-thread-factory scheduled-pool-thread-format
-                          scheduled-pool-thread-counter
-                          true)))
+  (let [registry (SharedMetricRegistries/getOrCreate "github-bot-app")]
+    (InstrumentedScheduledExecutorService.
+     (Executors/newSingleThreadScheduledExecutor
+      (InstrumentedThreadFactory.
+       (create-thread-factory scheduled-pool-thread-format
+                              scheduled-pool-thread-counter
+                              true)
+       registry
+       "github-bot-app-scheduled-threads"))
+     registry
+     "github-bot-app-scheduled-pool")))
 
 (defn schedule
   [^Long delay ^TimeUnit time-unit ^Runnable r]
