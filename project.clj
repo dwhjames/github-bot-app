@@ -6,6 +6,7 @@
             :distribution :manual
             :comments "same as Clojure"}
   :dependencies [[org.clojure/clojure "1.6.0"]
+                 [commons-codec "1.10"]
                  [compojure "1.3.1"]
                  [ring/ring-defaults "0.1.2"]
                  [tentacles "0.2.6"]
