@@ -3,6 +3,7 @@
             [clojure.tools.logging :as log]
             [ring.util.response :refer :all]
             [measure.core :refer [counter increment decrement
+                                  histogram update
                                   meter mark
                                   timer time!]])
   (:import com.codahale.metrics.SharedMetricRegistries))
@@ -14,6 +15,7 @@
   (let [registry (SharedMetricRegistries/getOrCreate "github-bot-app")
         active-request-counter (counter registry "ring.requests.active")
         request-meter (meter registry "ring.requests.rate")
+        request-size-hist (histogram registry "ring.requests.size")
         request-method-timers {:get     (timer registry "ring.handling-time.GET")
                                :put     (timer registry "ring.handling-time.PUT")
                                :post    (timer registry "ring.handling-time.POST")
@@ -32,6 +34,8 @@
       (try
         (let [request-method (:request-method request)]
           (mark request-meter)
+          (when-let [content-length (:content-length request)]
+            (update request-size-hist content-length))
           (let [t (get request-method-timers
                               request-method
                               (:other request-method-timers))
