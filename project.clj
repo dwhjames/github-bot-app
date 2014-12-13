@@ -15,15 +15,11 @@
                  [measure "0.1.7"]
                  [org.clojure/tools.logging "0.3.1"]
                  [ch.qos.logback/logback-classic "1.1.2"]]
-  :plugins [[lein-ring "0.8.13"]
-            [lein-elastic-beanstalk "0.2.8-SNAPSHOT"]
-            ;[lein-beanstalk "0.2.7"]
-            [lein-awsuberwar "0.1.0"]]
+  :plugins [[lein-ring "0.8.13"]]
   :ring {:handler github-bot-app.handler/app
          :init github-bot-app.handler/init
          :destroy github-bot-app.handler/destroy}
   :jvm-opts ["-Dcatalina.base=."]
   :profiles
   {:dev  {:dependencies [[javax.servlet/servlet-api "2.5"]
-                         [ring-mock "0.1.5"]]}}
-  :war-resources-path "war-resources")
+                         [ring-mock "0.1.5"]]}})
