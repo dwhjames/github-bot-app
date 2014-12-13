@@ -3,7 +3,8 @@
             [clojure.tools.logging :as log]
             [cheshire.core :as json]
             [measure.core :as measure]
-            [ring.util.response :refer :all]
+            [ring.util.response :refer [response status]]
+            [ring.util.request :refer [content-type content-length]]
             [github-bot-app.pools :as pools]
             [github-bot-app.action.auto-label :as auto-label]
             [github-bot-app.action.composite-pr :as composite-pr]
@@ -64,7 +65,7 @@
 
 (defn handle-webhook [req config]
   (if-let [event (get-in req [:headers "x-github-event"])]
-    (if-let [type (:content-type req)]
+    (if-let [type (content-type req)]
       (if (is-json-content? type)
         (if-let [payload (read-json req)]
           (do
@@ -73,7 +74,7 @@
                         :delivery (-> req
                                       (get-in [:headers "x-github-delivery"])
                                       java.util.UUID/fromString)}))
-            (measure/update payload-size-histogram (:content-length req))
+            (measure/update payload-size-histogram (content-length req))
             (dispatch-payload-actions event payload config)
             (-> (response nil)
                 (status 204)))

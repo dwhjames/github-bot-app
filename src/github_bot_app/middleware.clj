@@ -1,7 +1,8 @@
 (ns github-bot-app.middleware
   (:require [clojure.string :as str]
             [clojure.tools.logging :as log]
-            [ring.util.response :refer :all]
+            [ring.util.response :refer [response status]]
+            [ring.util.request :refer [content-length]]
             [measure.core :refer [counter increment decrement
                                   histogram update
                                   meter mark
@@ -34,8 +35,8 @@
       (try
         (let [request-method (:request-method request)]
           (mark request-meter)
-          (when-let [content-length (:content-length request)]
-            (update request-size-hist content-length))
+          (when-let [n (content-length request)]
+            (update request-size-hist n))
           (let [t (get request-method-timers
                               request-method
                               (:other request-method-timers))
