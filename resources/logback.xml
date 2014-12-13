@@ -8,11 +8,11 @@
   </appender>
 
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${catalina.base}/logs/github-bot-app.log</file>
+    <file>${LOG_DIR:-logs}/github-bot-app.log</file>
 
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- daily rollover -->
-      <fileNamePattern>${catalina.base}/logs/github-bot-app.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+      <fileNamePattern>${LOG_DIR:-logs}/github-bot-app.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
       <!-- keep 30 days' worth of history -->
       <maxHistory>30<!-- days --></maxHistory> 
     </rollingPolicy>
