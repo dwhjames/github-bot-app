@@ -26,5 +26,5 @@
            (:auth-options config)))
         (log/info (pr-str
                    {:api-call :create-comment
-                    :number issue-id
+                    :url (get-in payload [:issue :comments_url])
                     :info :hey-ping}))))))

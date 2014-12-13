@@ -22,7 +22,6 @@
               ", please add a description to your pull request.")
          (:auth-options config)))
       (log/info (pr-str
-                 {:event :pull-request
-                  :action :opened
-                  :number issue-id
-                  :police :no-description})))))
+                 {:api-call :create-coment
+                  :url (get-in payload [:pull_request :commits_url])
+                  :info :police-no-description})))))

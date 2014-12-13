@@ -25,7 +25,7 @@
        (:auth-options config)))
      (log/info (pr-str
                 {:api-call :add-labels
-                 :number issue-id
+                 :url (get-in payload [:pull_request :issue_url])
                  :add-labels labels-to-add})))
 
    (= event
@@ -48,7 +48,7 @@
            (:auth-options config)))
          (log/info (pr-str
                     {:api-call :add-labels
-                     :number issue-id
+                     :url (get-in payload [:issue :labels_url])
                      :add-labels [review-done-label]}))
          (github-api-time!
           (gh-issues/remove-label
@@ -57,5 +57,5 @@
            (:auth-options config)))
          (log/info (pr-str
                     {:api-call :remove-label
-                     :number issue-id
+                     :url (get-in payload [:issue :labels_url])
                      :remove-label review-label})))))))

@@ -41,6 +41,7 @@
       (log/info (pr-str
                  {:event :pull-request
                   :action :merged
+                  :url (get-in payload [:repository :pulls_url])
                   :number merged-pull-id
                   :base-ref base-ref
                   :others {:count (count open-pulls)
@@ -49,7 +50,7 @@
         (pools/dispatch
          #(let [pull (specific-pull owner repo (:number p) config)]
             (-> pull
-                (select-keys [:number :state :mergeable])
+                (select-keys [:url :state :mergeable])
                 (merge {:api-call :specific-pull})
                 pr-str
                 log/info))))
@@ -62,6 +63,7 @@
           (fn []
             (let [open-pulls-later (search-open-pulls owner repo base-ref config)]
               (log/info {:api-call :open-pulls
+                         :url (get-in payload [:repository :pulls_url])
                          :base-ref base-ref
                          :count (count open-pulls-later)
                          :numbers (map :number open-pulls-later)})
@@ -71,14 +73,14 @@
                    (let [pull-id (:number p)
                          pull (specific-pull owner repo pull-id config)]
                      (-> pull
-                         (select-keys [:number :state :mergeable])
+                         (select-keys [:url :state :mergeable])
                          (merge {:api-call :specific-pull})
                          pr-str
                          log/info)                     
                      (when (false? (:mergeable pull))
                        (log/info (pr-str
                                   {:info :merge-conflict
-                                   :number pull-id
+                                   :url (:url p)
                                    :base-ref base-ref
                                    :head-ref (get-in pull [:head :ref])
                                    :last-merged merged-pull-id}))
@@ -94,7 +96,7 @@
                          (:auth-options config)))
                        (log/info (pr-str
                                   {:api-call :create-comment
-                                   :number pull-id
+                                   :url (:comments_url p)
                                    :info :merge-conflict}))))))))))))
       (log/info (pr-str
                  {:schedule

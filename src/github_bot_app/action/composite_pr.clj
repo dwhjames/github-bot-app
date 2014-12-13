@@ -23,6 +23,7 @@
                      owner repo pull-id
                      (:auth-options config)))]
       (log/info (pr-str {:api-call :pull-commits
+                         :url (get-in payload [:pull_request :commits_url])
                          :count (count commits)
                          :shas (mapv #(-> % :sha (subs 0 7)) commits)}))
       (when-let [pr-strs (->> commits
@@ -38,5 +39,5 @@
                (str/join ", " pr-strs))
           (:auth-options config)))
         (log/info (pr-str {:api-call :create-comment
-                           :number pull-id
+                           :url (get-in payload [:pull_request :comments_url])
                            :info :composite-pr}))))))

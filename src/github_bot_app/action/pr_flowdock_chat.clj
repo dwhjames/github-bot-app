@@ -40,7 +40,7 @@
             (:auth-options config)))]
       (log/info (pr-str
                  {:api-call :issue-comments
-                  :number pull-id
+                  :url (get-in payload [:pull_request :comments_url])
                   :count (count comments)}))
       (doseq [comment comments]
         (when-let [matches (re-find data-cmd-pat (:body comment))]
