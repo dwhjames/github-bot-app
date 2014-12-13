@@ -20,6 +20,6 @@
          :init github-bot-app.handler/init
          :destroy github-bot-app.handler/destroy}
   :jvm-opts ["-Dcatalina.base=."]
-  :profiles
-  {:dev  {:dependencies [[javax.servlet/servlet-api "2.5"]
-                         [ring-mock "0.1.5"]]}})
+  :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
+                                  [ring-mock "0.1.5"]]}
+             :uberjar {:aot :all}})
