@@ -6,7 +6,8 @@
             :distribution :manual
             :comments "same as Clojure"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [compojure "1.1.6"]
+                 [compojure "1.3.1"]
+                 [ring/ring-defaults "0.1.2"]
                  [tentacles "0.2.6"]
                  [cheshire "5.3.1"]
                  [io.dropwizard.metrics/metrics-core "3.1.0"]
@@ -14,7 +15,7 @@
                  [measure "0.1.7"]
                  [org.clojure/tools.logging "0.3.1"]
                  [ch.qos.logback/logback-classic "1.1.2"]]
-  :plugins [[lein-ring "0.8.10"]
+  :plugins [[lein-ring "0.8.13"]
             [lein-elastic-beanstalk "0.2.8-SNAPSHOT"]
             ;[lein-beanstalk "0.2.7"]
             [lein-awsuberwar "0.1.0"]]
@@ -23,6 +24,6 @@
          :destroy github-bot-app.handler/destroy}
   :jvm-opts ["-Dcatalina.base=."]
   :profiles
-  {:test {:dependencies [[javax.servlet/servlet-api "2.5"]
+  {:dev  {:dependencies [[javax.servlet/servlet-api "2.5"]
                          [ring-mock "0.1.5"]]}}
   :war-resources-path "war-resources")
