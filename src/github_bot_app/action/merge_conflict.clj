@@ -26,6 +26,43 @@
      (:auth-options config))))
 
 
+(def conflict-comment-pat
+  #"^It looks like #\d+ got there first")
+
+
+(defn- last-conflict-comment-instant
+  [owner repo pull-id config]
+  (let [comments (github-api-time!
+          (gh-issues/issue-comments
+           owner repo pull-id
+           (:auth-options config)))]
+    (log/info (pr-str
+               {:api-all :issue-comments
+                :number pull-id
+                :count (count comments)}))
+    (->> comments
+         (filter #(re-find conflict-comment-pat (:body %)))
+         (map :created_at)
+         sort
+         last)))
+
+
+(defn- last-commit-instant
+  [owner repo pull-id config]
+  (let [commits (github-api-time!
+                 (gh-pulls/commits
+                  owner repo pull-id
+                  (:auth-options config)))]
+    (log/info (pr-str
+               {:api-all :pull-commits
+                :number pull-id
+                :count (count commits)}))
+    (->> commits
+         (map #(get-in % [:commit :committer :date]))
+         sort
+         last)))
+
+
 (defn run-action [event payload config]
   (when (and (= event
                 "pull_request")
@@ -84,20 +121,26 @@
                                    :base-ref base-ref
                                    :head-ref (get-in pull [:head :ref])
                                    :last-merged merged-pull-id}))
-                       (github-api-time!
-                        (gh-issues/create-comment
-                         owner repo pull-id
-                         (str "It looks like #"
-                              merged-pull-id
-                              " got there first and ruined your clean merge!\n\n"
-                              "You'll need to need to resolve the conflicts with the `"
-                              base-ref
-                              "` branch.\n")
-                         (:auth-options config)))
-                       (log/info (pr-str
-                                  {:api-call :create-comment
-                                   :url (:comments_url p)
-                                   :info :merge-conflict}))))))))))))
+                       (if (< 0 (compare (last-conflict-comment-instant owner repo pull-id config)
+                                         (last-commit-instant owner repo pull-id config))) ;; true if comment-instant is nil
+                         (do
+                           (github-api-time!
+                            (gh-issues/create-comment
+                             owner repo pull-id
+                             (str "It looks like #"
+                                  merged-pull-id
+                                  " got there first and ruined your clean merge!\n\n"
+                                  "You'll need to need to resolve the conflicts with the `"
+                                  base-ref
+                                  "` branch.\n")
+                             (:auth-options config)))
+                           (log/info (pr-str
+                                      {:api-call :create-comment
+                                       :url (:comments_url p)
+                                       :info :merge-conflict})))
+                         (log/info (pr-str
+                                    {:info :existing-merge-conflict
+                                     :url (:url p)})))))))))))))
       (log/info (pr-str
                  {:schedule
                   {:delay 5
