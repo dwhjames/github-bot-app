@@ -1,9 +1,10 @@
 {:bot-name ""
  :auth-options {:oauth-token ""}
  :auto-label
- {:review-label "review:needed"
-  :review-done-label "review:done"
-  :review-done-comment "^:[+]1:"
+ {:review-start-label "review: needed"
+  :review-done-remove-labels ["review: needed" "review: in progress" "review: waiting on reply"]
+  :review-done-add-label "review: done"
+  :review-done-comment "^(:[+]1:)|(\ud83d\udc4d)"
   :qa-label "qa:needed"}
  :flowdock
  {:token ""}}
