@@ -121,26 +121,32 @@
                                    :base-ref base-ref
                                    :head-ref (get-in pull [:head :ref])
                                    :last-merged merged-pull-id}))
-                       (if (< 0 (compare (last-conflict-comment-instant owner repo pull-id config)
-                                         (last-commit-instant owner repo pull-id config))) ;; true if comment-instant is nil
-                         (do
-                           (github-api-time!
-                            (gh-issues/create-comment
-                             owner repo pull-id
-                             (str "It looks like #"
-                                  merged-pull-id
-                                  " got there first and ruined your clean merge!\n\n"
-                                  "You'll need to need to resolve the conflicts with the `"
-                                  base-ref
-                                  "` branch.\n")
-                             (:auth-options config)))
-                           (log/info (pr-str
-                                      {:api-call :create-comment
-                                       :url (:comments_url p)
-                                       :info :merge-conflict})))
+                       (let [comment-inst (last-conflict-comment-instant owner repo pull-id config)
+                             commit-inst (last-commit-instant owner repo pull-id config)]
                          (log/info (pr-str
-                                    {:info :existing-merge-conflict
-                                     :url (:url p)})))))))))))))
+                                    {:info :merge-conflict
+                                     :url (:url p)
+                                     :comment-inst comment-inst
+                                     :commit-inst commit-inst}))
+                         (if (< (compare comment-inst commit-inst) 0) ;; true if comment-instant is nil
+                           (do
+                             (github-api-time!
+                              (gh-issues/create-comment
+                               owner repo pull-id
+                               (str "It looks like #"
+                                    merged-pull-id
+                                    " got there first and ruined your clean merge!\n\n"
+                                    "You'll need to need to resolve the conflicts with the `"
+                                    base-ref
+                                    "` branch.\n")
+                               (:auth-options config)))
+                             (log/info (pr-str
+                                        {:api-call :create-comment
+                                         :url (:comments_url p)
+                                         :info :merge-conflict})))
+                           (log/info (pr-str
+                                      {:info :existing-merge-conflict
+                                       :url (:url p)}))))))))))))))
       (log/info (pr-str
                  {:schedule
                   {:delay 5
