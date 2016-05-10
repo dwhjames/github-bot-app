@@ -9,7 +9,7 @@
                  [commons-codec "1.10"]
                  [compojure "1.3.4"]
                  [ring/ring-defaults "0.1.5"]
-                 [tentacles "0.3.0"]
+                 [tentacles "0.5.1"]
                  [cheshire "5.4.0"]
                  [io.dropwizard.metrics/metrics-core "3.1.2"]
                  [io.dropwizard.metrics/metrics-jvm "3.1.2"]
