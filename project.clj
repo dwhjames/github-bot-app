@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"
             :distribution :manual
             :comments "same as Clojure"}
-  :dependencies [[org.clojure/clojure "1.6.0"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
                  [commons-codec "1.10"]
                  [compojure "1.3.4"]
                  [ring/ring-defaults "0.1.5"]
