@@ -3,10 +3,7 @@
             [clojure.tools.logging :as log]
             [ring.util.response :refer [response status]]
             [ring.util.request :refer [content-length]]
-            [measure.core :refer [counter increment decrement
-                                  histogram update
-                                  meter mark
-                                  timer time!]])
+            [measure.core :as m])
   (:import com.codahale.metrics.SharedMetricRegistries))
 
 
@@ -14,37 +11,37 @@
   "Instrument a ring handler."
   [handler]
   (let [registry (SharedMetricRegistries/getOrCreate "github-bot-app")
-        active-request-counter (counter registry "ring.requests.active")
-        request-meter (meter registry "ring.requests.rate")
-        request-size-hist (histogram registry "ring.requests.size")
-        request-method-timers {:get     (timer registry "ring.handling-time.GET")
-                               :put     (timer registry "ring.handling-time.PUT")
-                               :post    (timer registry "ring.handling-time.POST")
-                               :head    (timer registry "ring.handling-time.HEAD")
-                               :delete  (timer registry "ring.handling-time.DELETE")
-                               :options (timer registry "ring.handling-time.OPTIONS")
-                               :trace   (timer registry "ring.handling-time.TRACE")
-                               :other   (timer registry "ring.handling-time.OTHER")}
-        response-status-meters {1 (meter registry "ring.responses.rate.1xx")
-                                2 (meter registry "ring.responses.rate.2xx")
-                                3 (meter registry "ring.responses.rate.3xx")
-                                4 (meter registry "ring.responses.rate.4xx")
-                                5 (meter registry "ring.responses.rate.5xx")}]
+        active-request-counter (m/counter registry "ring.requests.active")
+        request-meter (m/meter registry "ring.requests.rate")
+        request-size-hist (m/histogram registry "ring.requests.size")
+        request-method-timers {:get     (m/timer registry "ring.handling-time.GET")
+                               :put     (m/timer registry "ring.handling-time.PUT")
+                               :post    (m/timer registry "ring.handling-time.POST")
+                               :head    (m/timer registry "ring.handling-time.HEAD")
+                               :delete  (m/timer registry "ring.handling-time.DELETE")
+                               :options (m/timer registry "ring.handling-time.OPTIONS")
+                               :trace   (m/timer registry "ring.handling-time.TRACE")
+                               :other   (m/timer registry "ring.handling-time.OTHER")}
+        response-status-meters {1 (m/meter registry "ring.responses.rate.1xx")
+                                2 (m/meter registry "ring.responses.rate.2xx")
+                                3 (m/meter registry "ring.responses.rate.3xx")
+                                4 (m/meter registry "ring.responses.rate.4xx")
+                                5 (m/meter registry "ring.responses.rate.5xx")}]
     (fn [request]
-      (increment active-request-counter)
+      (m/increment active-request-counter)
       (try
         (let [request-method (:request-method request)]
-          (mark request-meter)
+          (m/mark request-meter)
           (when-let [n (content-length request)]
-            (update request-size-hist n))
+            (m/update request-size-hist n))
           (let [t (get request-method-timers
                               request-method
                               (:other request-method-timers))
-                resp (time! t #(handler request))
+                resp (m/time! t #(handler request))
                 status-code (:status resp)]
-            (mark (get response-status-meters (quot status-code 100)))
+            (m/mark (get response-status-meters (quot status-code 100)))
             resp))
-        (finally (decrement active-request-counter))))))
+        (finally (m/decrement active-request-counter))))))
 
 
 (defn wrap-request-logger
