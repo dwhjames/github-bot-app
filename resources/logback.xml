@@ -13,8 +13,8 @@
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- daily rollover -->
       <fileNamePattern>${LOG_DIR:-logs}/github-bot-app.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
-      <!-- keep 30 days' worth of history -->
-      <maxHistory>30<!-- days --></maxHistory> 
+      <!-- keep 90 days' worth of history -->
+      <maxHistory>90<!-- days --></maxHistory> 
     </rollingPolicy>
 
     <encoder>
@@ -22,12 +22,25 @@
     </encoder>
   </appender>
 
-  <logger name="github-bot-app" level="INFO">
-    <appender-ref ref="FILE" />
-  </logger>
+  <appender name="STASH" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR:-logs}/github-bot-app-logstash.log</file>
+
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- daily rollover -->
+      <fileNamePattern>${LOG_DIR:-logs}/github-bot-app-logstash.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <!-- keep 2 days' worth of history -->
+      <maxHistory>2<!-- days --></maxHistory>
+    </rollingPolicy>
+
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+  </appender>
+
+  <logger name="github-bot-app" level="DEBUG" />
 
   <root level="INFO">
-    <appender-ref ref="STDOUT" />
+    <!-- <appender-ref ref="STDOUT" /> -->
+    <appender-ref ref="FILE" />
+    <appender-ref ref="STASH" />
   </root>
 
 </configuration>

@@ -7,15 +7,17 @@
             :comments "same as Clojure"}
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [commons-codec "1.10"]
-                 [compojure "1.3.4"]
-                 [ring/ring-defaults "0.1.5"]
-                 [tentacles "0.5.1"]
-                 [cheshire "5.4.0"]
+                 [compojure "1.5.2"]
+                 [ring/ring-defaults "0.2.3"]
+                 [irresponsible/tentacles "0.6.1"]
+                 [cheshire "5.7.0"]
                  [io.dropwizard.metrics/metrics-core "3.1.2"]
                  [io.dropwizard.metrics/metrics-jvm "3.1.2"]
                  [measure "0.1.7"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [ch.qos.logback/logback-classic "1.1.3"]]
+                 [org.slf4j/slf4j-api "1.7.25"]
+                 [ch.qos.logback/logback-classic "1.2.3"]
+                 [net.logstash.logback/logstash-logback-encoder "4.9"]]
   :plugins [[lein-ring "0.9.4"]]
   :ring {:handler github-bot-app.handler/app
          :init github-bot-app.handler/init
