@@ -22,14 +22,19 @@
 
 
 (defn- ^Runnable wrap-runnable
-  [^Runnable r]
-  (reify Runnable
-    (run [this]
-      (try
-        (.run r)
-        (catch Exception ex
-          (log/error ex "Uncaught exception in pool!")
-          (throw ex))))))
+  ([^String task-desc ^Runnable r]
+   (let [st (.getStackTrace (Exception.))]
+     (reify Runnable
+       (run [this]
+         (try
+           (.run r)
+           (catch Exception ex
+             (log/error
+               (doto (RuntimeException. (str "Failed while executing task: " task-desc) ex)
+                 (.setStackTrace st))
+               "Uncaught exception in pool!")))))))
+  ([^Runnable r]
+   (wrap-runnable nil r)))
 
 
 (def dispatch-pool-thread-format
@@ -43,19 +48,21 @@
 (def ^ExecutorService dispatch-pool
   (let [registry (SharedMetricRegistries/getOrCreate "github-bot-app")]
     (InstrumentedExecutorService.
-     (Executors/newCachedThreadPool
-     (InstrumentedThreadFactory.
-      (create-thread-factory dispatch-pool-thread-format
-                             dispatch-pool-thread-counter)
+      (Executors/newCachedThreadPool
+        (InstrumentedThreadFactory.
+          (create-thread-factory dispatch-pool-thread-format
+                              dispatch-pool-thread-counter)
+          registry
+          "github-bot-app-dispatch-threads"))
       registry
-      "github-bot-app-dispatch-threads"))
-     registry
-     "github-bot-app-dispatch-pool")))
+      "github-bot-app-dispatch-pool")))
 
 
 (defn dispatch
-  [^Runnable r]
-  (.execute dispatch-pool (wrap-runnable r)))
+  ([^String task-desc ^Runnable r]
+   (.execute dispatch-pool (wrap-runnable task-desc r)))
+  ([^Runnable r]
+   (dispatch nil r)))
 
 
 (def scheduled-pool-thread-format

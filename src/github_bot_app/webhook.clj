@@ -43,19 +43,19 @@
 
 
 (def payload-actions
-  [run-ping-action
-   auto-label/run-action
-   composite-pr/run-action
-   hey-ping/run-action
-   merge-conflict/run-action
-   pr-flowdock-chat/run-action
-   pr-police/run-action])
+  [["ping"             run-ping-action]
+   ["auto-label"       auto-label/run-action]
+   ["composite-pr"     composite-pr/run-action]
+   ["hey-ping"         hey-ping/run-action]
+   ["merge-conflict"   merge-conflict/run-action]
+   ["pr-flowdock-chat" pr-flowdock-chat/run-action]
+   ["pr-police"        pr-police/run-action]])
 
 
 (defn- dispatch-payload-actions
   [event payload config]
-  (doseq [act payload-actions]
-    (pools/dispatch #(act event payload config))))
+  (doseq [[label act] payload-actions]
+    (pools/dispatch (str "payload action " label) #(act event payload config))))
 
 
 (def payload-size-histogram

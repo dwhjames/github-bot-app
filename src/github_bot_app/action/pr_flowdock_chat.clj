@@ -54,6 +54,7 @@
                           :flowdock)
                        (get-in m [:do :say]))
               (pools/dispatch
+               "send flowdock chat"
                (fn []
                  (send-flowdock-chat (get-in m [:do :say])
                                      [(str "#" pull-id)]

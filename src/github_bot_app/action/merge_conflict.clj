@@ -85,6 +85,7 @@
                            :numbers (map :number open-pulls)}}))
       (doseq [p open-pulls]
         (pools/dispatch
+         (str "poking PR #" (:number p))
          #(let [pull (specific-pull owner repo (:number p) config)]
             (-> pull
                 (select-keys [:url :state :mergeable])
@@ -97,6 +98,7 @@
          (log/info (pr-str {:schedule :run
                             :task schedule-uuid}))
          (pools/dispatch
+          "scanning open PRs for merge conflicts"
           (fn []
             (let [open-pulls-later (search-open-pulls owner repo base-ref config)]
               (log/info {:api-call :open-pulls
@@ -106,6 +108,7 @@
                          :numbers (map :number open-pulls-later)})
               (doseq [p open-pulls-later]
                 (pools/dispatch
+                 (str "checking PR #" (:number p) " for merge conflicts")
                  (fn []
                    (let [pull-id (:number p)
                          pull (specific-pull owner repo pull-id config)]
