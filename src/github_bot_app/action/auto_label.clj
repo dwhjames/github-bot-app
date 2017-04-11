@@ -62,7 +62,7 @@
    (and (= event
            "pull_request_review")
         (= (:action payload) "submitted")
-        (= (get-in [:review :state]) "approved"))
+        (= (get-in payload [:review :state]) "approved"))
    (let [issue-user (get-in payload [:issue :user :login])
          review-user (get-in payload [:review :user :login])]
     (when (not (= issue-user review-user))
