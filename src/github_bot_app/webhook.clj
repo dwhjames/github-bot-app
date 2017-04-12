@@ -2,9 +2,10 @@
   (:require [clojure.java.io :as jio]
             [clojure.tools.logging :as log]
             [cheshire.core :as json]
-            [measure.core :as measure]
+            [metrics.histograms :as hist]
             [ring.util.response :refer [response status]]
             [ring.util.request :refer [content-type content-length]]
+            [github-bot-app.metrics :as metrics]
             [github-bot-app.pools :as pools]
             [github-bot-app.action.auto-label :as auto-label]
             [github-bot-app.action.composite-pr :as composite-pr]
@@ -59,8 +60,8 @@
 
 
 (def payload-size-histogram
-  (measure/histogram (SharedMetricRegistries/getOrCreate "github-bot-app")
-                     "github-bot-app.webhook.payload-size"))
+  (hist/histogram (metrics/lookup-registry)
+                  "github-bot-app.webhook.payload-size"))
 
 
 (defn handle-webhook [req config]
@@ -74,7 +75,7 @@
                         :delivery (-> req
                                       (get-in [:headers "x-github-delivery"])
                                       java.util.UUID/fromString)}))
-            (measure/update payload-size-histogram (content-length req))
+            (hist/update! payload-size-histogram (content-length req))
             (dispatch-payload-actions event payload config)
             (-> (response nil)
                 (status 204)))

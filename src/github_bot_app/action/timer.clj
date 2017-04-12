@@ -1,12 +1,13 @@
 (ns github-bot-app.action.timer
-  (:require [measure.core :refer [timer]])
+  (:require [metrics.timers :refer [timer]]
+            [github-bot-app.metrics :as metrics])
   (:import [com.codahale.metrics
             SharedMetricRegistries
             Timer]))
 
 
 (def ^Timer github-api-timer
-  (timer (SharedMetricRegistries/getOrCreate "github-bot-app")
+  (timer (metrics/lookup-registry)
          "github-bot-app.github-api.call-time"))
 
 

@@ -1,5 +1,6 @@
 (ns github-bot-app.pools
-  (:require [clojure.tools.logging :as log])
+  (:require [clojure.tools.logging :as log]
+            [github-bot-app.metrics :as metrics])
   (:import [java.util.concurrent Executors ExecutorService
                                  ScheduledExecutorService ThreadFactory
                                  TimeUnit]
@@ -7,8 +8,7 @@
            [com.codahale.metrics
             InstrumentedExecutorService
             InstrumentedScheduledExecutorService
-            InstrumentedThreadFactory
-            SharedMetricRegistries]))
+            InstrumentedThreadFactory]))
 
 
 (defn- create-thread-factory
@@ -46,7 +46,7 @@
 
 
 (def ^ExecutorService dispatch-pool
-  (let [registry (SharedMetricRegistries/getOrCreate "github-bot-app")]
+  (let [registry (metrics/lookup-registry)]
     (InstrumentedExecutorService.
       (Executors/newCachedThreadPool
         (InstrumentedThreadFactory.
@@ -74,7 +74,7 @@
 
 
 (def ^ScheduledExecutorService scheduled-pool
-  (let [registry (SharedMetricRegistries/getOrCreate "github-bot-app")]
+  (let [registry (metrics/lookup-registry)]
     (InstrumentedScheduledExecutorService.
      (Executors/newSingleThreadScheduledExecutor
       (InstrumentedThreadFactory.
