@@ -37,7 +37,7 @@
            owner repo pull-id
            (:auth-options config)))]
     (log/info (pr-str
-               {:api-all :issue-comments
+               {:api-call :issue-comments
                 :number pull-id
                 :count (count comments)}))
     (->> comments
@@ -54,7 +54,7 @@
                   owner repo pull-id
                   (:auth-options config)))]
     (log/info (pr-str
-               {:api-all :pull-commits
+               {:api-call :pull-commits
                 :number pull-id
                 :count (count commits)}))
     (->> commits

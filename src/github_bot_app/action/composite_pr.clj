@@ -25,7 +25,7 @@
       (log/info (pr-str {:api-call :pull-commits
                          :url (get-in payload [:pull_request :commits_url])
                          :count (count commits)
-                         :shas (mapv #(-> % :sha (subs 0 7)) commits)}))
+                         :shas (mapv #(some-> % :sha (subs 0 7)) commits)}))
       (when-let [pr-strs (->> commits
                               (mapcat
                                #(when-let [matches (re-find merge-commit-pat
