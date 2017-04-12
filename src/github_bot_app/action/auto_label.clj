@@ -21,10 +21,10 @@
     (github-api-time!
       (gh-issues/remove-label owner repo issue-id label
        (:auth-options config)))
-    (log/info (pr-str)
-              {:api-call :remove-label
-               :url (get-in payload [:issue :labels_url])
-               :remove-label label}))))
+    (log/info (pr-str
+               {:api-call :remove-label
+                :url (get-in payload [:issue :labels_url])
+                :remove-label label})))))
 
 (defn run-action [event payload config]
   (cond
@@ -35,7 +35,6 @@
    (let [owner (get-in payload [:repository :owner :login])
          repo (get-in payload [:repository :name])
          issue-id (get-in payload [:pull_request :number])
-         base-ref (get-in payload [:pull_request :base :ref])
          labels-to-add [(get-in config [:auto-label :review-start-label])]]
      (github-api-time!
       (gh-issues/add-labels

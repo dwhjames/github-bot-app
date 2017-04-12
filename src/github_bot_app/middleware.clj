@@ -1,8 +1,6 @@
 (ns github-bot-app.middleware
-  (:require [clojure.string :as str]
-            [clojure.tools.logging :as log]
-            [ring.util.response :refer [response status]]
-            [ring.util.request :refer [content-length]]))
+  (:require [clojure.tools.logging :as log]
+            [ring.util.response :refer [response status]]))
 
 
 (defn wrap-request-logger

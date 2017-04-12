@@ -3,8 +3,8 @@
             [clojure.tools.logging :as log]
             [cheshire.core :as json]
             [metrics.histograms :as hist]
-            [ring.util.response :refer [response status]]
-            [ring.util.request :refer [content-type content-length]]
+            [ring.util.response :as rresp]
+            [ring.util.request :as rreq]
             [github-bot-app.metrics :as metrics]
             [github-bot-app.pools :as pools]
             [github-bot-app.action.auto-label :as auto-label]
@@ -13,8 +13,7 @@
             [github-bot-app.action.merge-conflict :as merge-conflict]
             [github-bot-app.action.pr-flowdock-chat :as pr-flowdock-chat]
             [github-bot-app.action.pr-police :as pr-police])
-  (:import com.fasterxml.jackson.core.JsonParseException
-           com.codahale.metrics.SharedMetricRegistries))
+  (:import com.fasterxml.jackson.core.JsonParseException))
 
 
 (defn- is-json-content? [type]
@@ -31,9 +30,9 @@
 
 
 (defn- error-resp [code body]
-  (-> (response body)
-      (content-type "text/plain")
-      (status code)))
+  (-> (rresp/response body)
+      (rresp/content-type "text/plain")
+      (rresp/status code)))
 
 
 (defn- run-ping-action [event payload config]
@@ -66,7 +65,7 @@
 
 (defn handle-webhook [req config]
   (if-let [event (get-in req [:headers "x-github-event"])]
-    (if-let [type (content-type req)]
+    (if-let [type (rreq/content-type req)]
       (if (is-json-content? type)
         (if-let [payload (read-json req)]
           (do
@@ -75,10 +74,10 @@
                         :delivery (-> req
                                       (get-in [:headers "x-github-delivery"])
                                       java.util.UUID/fromString)}))
-            (hist/update! payload-size-histogram (content-length req))
+            (hist/update! payload-size-histogram (rreq/content-length req))
             (dispatch-payload-actions event payload config)
-            (-> (response nil)
-                (status 204)))
+            (-> (rresp/response nil)
+                (rresp/status 204)))
           (error-resp 400 "Bad Json"))
         (error-resp 415 "Expected Json Content-Type"))
       (error-resp 415 "Missing Content-Type header"))
