@@ -6,5 +6,8 @@
   :review-done-add-label "review: done"
   :review-done-comment "^(:[+]1:)|(\ud83d\udc4d)"
   :qa-label "qa:needed"}
+ :auto-merge
+ {:auto-merge-label "pr: Merge When Green"
+  :ci-status-context "jenkins-ghprb"}
  :flowdock
  {:token ""}}

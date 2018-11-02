@@ -8,6 +8,7 @@
             [github-bot-app.metrics :as metrics]
             [github-bot-app.pools :as pools]
             [github-bot-app.action.auto-label :as auto-label]
+            [github-bot-app.action.auto-merge :as auto-merge]
             [github-bot-app.action.composite-pr :as composite-pr]
             [github-bot-app.action.hey-ping :as hey-ping]
             [github-bot-app.action.merge-conflict :as merge-conflict]
@@ -41,10 +42,17 @@
                {:event :ping
                 :hook-id (:hook_id payload)}))))
 
+(defn- debug-status-action [event payload config]
+  (when (= event "status")
+    (log/info (pr-str
+               {:event :status
+                :payload payload}))))
 
 (def payload-actions
   [["ping"             run-ping-action]
    ["auto-label"       auto-label/run-action]
+   ; ["debug-status"     debug-status-action]
+   ["auto-merge"       auto-merge/run-action]
    ["composite-pr"     composite-pr/run-action]
    ["hey-ping"         hey-ping/run-action]
    ["merge-conflict"   merge-conflict/run-action]
