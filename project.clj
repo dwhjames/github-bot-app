@@ -5,22 +5,23 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"
             :distribution :manual
             :comments "same as Clojure"}
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [commons-codec "1.10"]
-                 [compojure "1.5.2"]
-                 [ring/ring-defaults "0.2.3"]
-                 [irresponsible/tentacles "0.6.1"]
-                 [cheshire "5.7.0"]
-                 [io.dropwizard.metrics/metrics-core "3.1.2"]
-                 [io.dropwizard.metrics/metrics-jvm "3.1.2"]
-                 [metrics-clojure "2.9.0"]
-                 [metrics-clojure-ring "2.9.0"]
-                 [metrics-clojure-jvm "2.9.0"]
-                 [org.clojure/tools.logging "0.3.1"]
+  :dependencies [[org.clojure/clojure "1.9.0"]
+                 [commons-codec "1.11"]
+                 [commons-io "2.6"]
+                 [compojure "1.6.1"]
+                 [ring/ring-defaults "0.3.2"]
+                 [irresponsible/tentacles "0.6.2"]
+                 [cheshire "5.8.1"]
+                 [io.dropwizard.metrics/metrics-core "3.2.2"]
+                 [io.dropwizard.metrics/metrics-jvm "3.2.2"]
+                 [metrics-clojure "2.10.0"]
+                 [metrics-clojure-ring "2.10.0"]
+                 [metrics-clojure-jvm "2.10.0"]
+                 [org.clojure/tools.logging "0.4.1"]
                  [org.slf4j/slf4j-api "1.7.25"]
                  [ch.qos.logback/logback-classic "1.2.3"]
-                 [net.logstash.logback/logstash-logback-encoder "4.9"]]
-  :plugins [[lein-ring "0.9.4"]]
+                 [net.logstash.logback/logstash-logback-encoder "5.2"]]
+  :plugins [[lein-ring "0.12.4"]]
   :ring {:handler github-bot-app.handler/app
          :init github-bot-app.handler/init
          :destroy github-bot-app.handler/destroy}
