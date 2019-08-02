@@ -12,7 +12,6 @@
             [github-bot-app.action.composite-pr :as composite-pr]
             [github-bot-app.action.hey-ping :as hey-ping]
             [github-bot-app.action.merge-conflict :as merge-conflict]
-            [github-bot-app.action.pr-flowdock-chat :as pr-flowdock-chat]
             [github-bot-app.action.pr-police :as pr-police])
   (:import com.fasterxml.jackson.core.JsonParseException))
 
@@ -56,7 +55,6 @@
    ["composite-pr"     composite-pr/run-action]
    ["hey-ping"         hey-ping/run-action]
    ["merge-conflict"   merge-conflict/run-action]
-   ["pr-flowdock-chat" pr-flowdock-chat/run-action]
    ["pr-police"        pr-police/run-action]])
 
 
